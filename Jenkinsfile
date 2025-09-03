@@ -50,25 +50,26 @@ pipeline {
         stage('Deploy to ACI') {
             steps {
                 sh """
-                    echo Fetching ACR credentials...
-                    for /f "delims=" %%u in ('az acr credential show --name %ACR_NAME% --query "username" -o tsv') do set USERNAME=%%u
-                    for /f "delims=" %%p in ('az acr credential show --name %ACR_NAME% --query "passwords[0].value" -o tsv') do set PASSWORD=%%p
+                    echo "Fetching ACR credentials..."
+                    USERNAME=$(az acr credential show --name $ACR_NAME --query "username" -o tsv)
+                    PASSWORD=$(az acr credential show --name $ACR_NAME --query "passwords[0].value" -o tsv)
 
-                    echo Deploying container to Azure...
-                    az container create ^
-                      --resource-group %RESOURCE_GROUP% ^
-                      --name %ACI_NAME% ^
-                      --image %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG% ^
-                      --registry-login-server %ACR_LOGIN_SERVER% ^
-                      --registry-username %USERNAME% ^
-                      --registry-password %PASSWORD% ^
-                      --dns-name-label %ACI_NAME%-demo ^
-                      --ports 8000 ^
-                      --os-type Linux ^
-                      --location %LOCATION% ^
-                      --cpu 1 ^
-                      --memory 1.5 ^
-                      --restart-policy Always
+                    echo "Deploying container to Azure..."
+                    az container create \
+                    --resource-group $RESOURCE_GROUP \
+                    --name $ACI_NAME \
+                    --image $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG \
+                    --registry-login-server $ACR_LOGIN_SERVER \
+                    --registry-username $USERNAME \
+                    --registry-password $PASSWORD \
+                    --dns-name-label ${ACI_NAME}-demo \
+                    --ports 8000 \
+                    --os-type Linux \
+                    --location $LOCATION \
+                    --cpu 1 \
+                    --memory 1.5 \
+                    --restart-policy Always
+
                 """
             }
         }
