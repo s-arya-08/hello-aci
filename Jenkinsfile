@@ -9,6 +9,10 @@ pipeline {
         RESOURCE_GROUP = 'test-rg'        // e.g. test-rg
         ACI_NAME = 'sample-aci'
         LOCATION = 'eastus'                           // pick your region
+        AZURE_CLIENT_ID = credentials('azure-sp-client-id')    
+        AZURE_CLIENT_SECRET = credentials('azure-sp-client-secret')
+        AZURE_TENANT_ID = credentials('azure-sp-tenant-id')
+        AZURE_SUBSCRIPTION_ID = "8b417db1-2052-4045-bea7-16fd2bc33574"
     }
 
     stages {
@@ -21,12 +25,25 @@ pipeline {
                 """
             }
         }
+        stage('Azure Login') {
+            steps {
+                script {
+                    sh """
+                        az login --service-principal \
+                          --username $AZURE_CLIENT_ID \
+                          --password $AZURE_CLIENT_SECRET \
+                          --tenant $AZURE_TENANT_ID
+                        az account set --subscription $AZURE_SUBSCRIPTION_ID
+                    """
+                }
+            }
+        }
 
         stage('Push to ACR') {
             steps {
                 bat """
                     echo Login to ACR and push...
-                    az login --tenant "8b417db1-2052-4045-bea7-16fd2bc33574"
+                    // az login --tenant 
                     az acr login --name %ACR_NAME%
                     docker push %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG%
                 """
