@@ -63,7 +63,7 @@ pipeline {
                     --registry-username \$USERNAME \\
                     --registry-password \$PASSWORD \\
                     --dns-name-label \${ACI_NAME}-demo \\
-                    --ports 8000 \\
+                    --ports 80 \\
                     --os-type Linux \\
                     --location \$LOCATION \\
                     --cpu 1 \\
