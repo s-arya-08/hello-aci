@@ -26,7 +26,7 @@ pipeline {
             steps {
                 bat """
                     echo Login to ACR and push...
-                    az login --use-device-code
+                    az login --tenant "8b417db1-2052-4045-bea7-16fd2bc33574"
                     az acr login --name %ACR_NAME%
                     docker push %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG%
                 """
