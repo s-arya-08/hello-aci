@@ -43,7 +43,6 @@ pipeline {
             steps {
                 bat """
                     echo Login to ACR and push...
-                    // az login --tenant 
                     az acr login --name %ACR_NAME%
                     docker push %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG%
                 """
@@ -67,6 +66,7 @@ pipeline {
                       --registry-password %PASSWORD% ^
                       --dns-name-label %ACI_NAME%-demo ^
                       --ports 80 ^
+                      --os-type Linux ^
                       --location %LOCATION% ^
                       --restart-policy Always
                 """
