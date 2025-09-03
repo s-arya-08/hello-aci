@@ -30,21 +30,32 @@ pipeline {
                 }
             }
         }
-        stage('Build Docker Image') {
+        // stage('Build Docker Image') {
+        //     steps {
+        //         bat """
+        //             echo Building Docker image...
+        //             docker build -t %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG% .
+        //         """
+        //     }
+        // }
+        stage('Build and Push to ACR') {
             steps {
+                // bat """
+                //     echo Login to ACR and push...
+                //     az acr login --name %ACR_NAME%
+                //     docker push %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG%
+                // """
                 bat """
-                    echo Building Docker image...
+                    echo Logging Docker into ACR...
+                    docker login %ACR_LOGIN_SERVER% -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET%
+
+                    echo Building image...
                     docker build -t %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG% .
-                """
-            }
-        }
-        stage('Push to ACR') {
-            steps {
-                bat """
-                    echo Login to ACR and push...
-                    az acr login --name %ACR_NAME%
+
+                    echo Pushing image...
                     docker push %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG%
                 """
+
             }
         }
 
