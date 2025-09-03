@@ -16,15 +16,7 @@ pipeline {
     }
 
     stages {
-        stage('Build Docker Image') {
-            steps {
-                bat """
-                    echo Building Docker image...
-                    docker build -t %IMAGE_NAME%:%IMAGE_TAG% .
-                    docker tag %IMAGE_NAME%:%IMAGE_TAG% %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG%
-                """
-            }
-        }
+        
         stage('Azure Login') {
             steps {
                 script {
@@ -38,7 +30,14 @@ pipeline {
                 }
             }
         }
-
+        stage('Build Docker Image') {
+            steps {
+                bat """
+                    echo Building Docker image...
+                    docker build -t %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG% .
+                """
+            }
+        }
         stage('Push to ACR') {
             steps {
                 bat """
