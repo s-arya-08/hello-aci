@@ -28,7 +28,7 @@ pipeline {
         stage('Azure Login') {
             steps {
                 script {
-                    sh """
+                    bat """
                         az login --service-principal \
                           --username $AZURE_CLIENT_ID \
                           --password $AZURE_CLIENT_SECRET \
