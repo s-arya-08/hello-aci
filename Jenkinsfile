@@ -51,28 +51,28 @@ pipeline {
             steps {
                 sh """
                     echo "Fetching ACR credentials..."
-                    USERNAME=$(az acr credential show --name $ACR_NAME --query "username" -o tsv)
-                    PASSWORD=$(az acr credential show --name $ACR_NAME --query "passwords[0].value" -o tsv)
+                    USERNAME=\$(az acr credential show --name \$ACR_NAME --query "username" -o tsv)
+                    PASSWORD=\$(az acr credential show --name \$ACR_NAME --query "passwords[0].value" -o tsv)
 
                     echo "Deploying container to Azure..."
-                    az container create \
-                    --resource-group $RESOURCE_GROUP \
-                    --name $ACI_NAME \
-                    --image $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG \
-                    --registry-login-server $ACR_LOGIN_SERVER \
-                    --registry-username $USERNAME \
-                    --registry-password $PASSWORD \
-                    --dns-name-label ${ACI_NAME}-demo \
-                    --ports 8000 \
-                    --os-type Linux \
-                    --location $LOCATION \
-                    --cpu 1 \
-                    --memory 1.5 \
+                    az container create \\
+                    --resource-group \$RESOURCE_GROUP \\
+                    --name \$ACI_NAME \\
+                    --image \$ACR_LOGIN_SERVER/\$IMAGE_NAME:\$IMAGE_TAG \\
+                    --registry-login-server \$ACR_LOGIN_SERVER \\
+                    --registry-username \$USERNAME \\
+                    --registry-password \$PASSWORD \\
+                    --dns-name-label \${ACI_NAME}-demo \\
+                    --ports 8000 \\
+                    --os-type Linux \\
+                    --location \$LOCATION \\
+                    --cpu 1 \\
+                    --memory 1.5 \\
                     --restart-policy Always
-
                 """
             }
         }
+
     }
 
     post {
