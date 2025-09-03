@@ -68,6 +68,8 @@ pipeline {
                       --ports 80 ^
                       --os-type Linux ^
                       --location %LOCATION% ^
+                      --cpu 1 ^
+                      --memory 1.5 ^
                       --restart-policy Always
                 """
             }
