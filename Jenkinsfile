@@ -31,7 +31,7 @@ pipeline {
         }
         stage('Build and Push to ACR') {
             steps {
-                sh '''
+                sh """
                     echo "Logging Docker into ACR..."
                     echo $AZURE_CLIENT_SECRET | docker login $ACR_LOGIN_SERVER -u $AZURE_CLIENT_ID --password-stdin
 
@@ -41,7 +41,7 @@ pipeline {
 
                     echo "Pushing image..."
                     docker push ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${IMAGE_TAG}
-                '''
+                """
             }
         }
 
