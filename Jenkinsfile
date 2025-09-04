@@ -5,7 +5,7 @@ pipeline {
         ACR_NAME = 'cpxqa'                      // e.g. mytestacr
         ACR_LOGIN_SERVER = "cpxqa.azurecr.io"   // e.g. mytestacr.azurecr.io
         IMAGE_NAME = 'dev/cpx-re-auth'
-        IMAGE_TAG = 'v2'
+        IMAGE_TAG = 'v3'
         RESOURCE_GROUP = 'CPX-DEV'        // e.g. test-rg
         ACI_NAME = 'dev-cpx-re-auth'
         LOCATION = 'eastus'                           // pick your region
