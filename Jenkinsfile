@@ -11,7 +11,7 @@ pipeline {
         LOCATION = 'eastus'                           // pick your region
         AZURE_CLIENT_ID = credentials('cpx-azure-application-id')    
         AZURE_CLIENT_SECRET = credentials('cpx-azure-secret-value')
-        AZURE_TENANT_ID = credentials('cpx-azure-tenant-ID')
+        AZURE_TENANT_ID = credentials('cpx-azure-tanent-ID')
         AZURE_SUBSCRIPTION_ID = credentials('cpx-azure-subscription-ID')
     }
 
