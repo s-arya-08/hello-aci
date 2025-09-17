@@ -1,14 +1,22 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'OS_TYPE', defaultValue: 'Linux', description: 'OS type for the container (Linux/Windows)')
+        string(name: 'PORT', defaultValue: '80', description: 'Port to expose')
+        string(name: 'CPU', defaultValue: '1', description: 'Number of CPU cores')
+        string(name: 'MEMORY', defaultValue: '1.5', description: 'Amount of memory in GB')
+        string(name: 'LOCATION', defaultValue: 'eastus', description: 'Azure region for deployment')
+    }
+
     environment {
-        ACR_NAME = 'sanskartestacr'                      // e.g. mytestacr
-        ACR_LOGIN_SERVER = "sanskartestacr.azurecr.io"   // e.g. mytestacr.azurecr.io
+        ACR_NAME = 'sanskartestacr'
+        ACR_LOGIN_SERVER = "sanskartestacr.azurecr.io"
         IMAGE_NAME = 'sample-aci-app'
         IMAGE_TAG = 'v1'
-        RESOURCE_GROUP = 'test-rg'        // e.g. test-rg
+        RESOURCE_GROUP = 'test-rg'
         ACI_NAME = 'sample-aci'
-        LOCATION = 'eastus'                           // pick your region
+
         AZURE_CLIENT_ID = credentials('azure-sp-client-id')    
         AZURE_CLIENT_SECRET = credentials('azure-sp-client-secret')
         AZURE_TENANT_ID = credentials('azure-sp-tenant-id')
@@ -16,35 +24,22 @@ pipeline {
     }
 
     stages {
-        
         stage('Azure Login') {
             steps {
                 script {
                     bat """
-                        az login --service-principal \
-                          --username $AZURE_CLIENT_ID \
-                          --password $AZURE_CLIENT_SECRET \
+                        az login --service-principal ^
+                          --username $AZURE_CLIENT_ID ^
+                          --password $AZURE_CLIENT_SECRET ^
                           --tenant $AZURE_TENANT_ID
                         az account set --subscription $AZURE_SUBSCRIPTION_ID
                     """
                 }
             }
         }
-        // stage('Build Docker Image') {
-        //     steps {
-        //         bat """
-        //             echo Building Docker image...
-        //             docker build -t %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG% .
-        //         """
-        //     }
-        // }
+
         stage('Build and Push to ACR') {
             steps {
-                // bat """
-                //     echo Login to ACR and push...
-                //     az acr login --name %ACR_NAME%
-                //     docker push %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG%
-                // """
                 bat """
                     echo Logging Docker into ACR...
                     docker login %ACR_LOGIN_SERVER% -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET%
@@ -55,7 +50,6 @@ pipeline {
                     echo Pushing image...
                     docker push %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG%
                 """
-
             }
         }
 
@@ -75,11 +69,11 @@ pipeline {
                       --registry-username %USERNAME% ^
                       --registry-password %PASSWORD% ^
                       --dns-name-label %ACI_NAME%-demo ^
-                      --ports 80 ^
-                      --os-type Linux ^
-                      --location %LOCATION% ^
-                      --cpu 1 ^
-                      --memory 1.5 ^
+                      --ports ${PORT} ^
+                      --os-type ${OS_TYPE} ^
+                      --location ${LOCATION} ^
+                      --cpu ${CPU} ^
+                      --memory ${MEMORY} ^
                       --restart-policy Always
                 """
             }
