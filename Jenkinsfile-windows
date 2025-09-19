@@ -68,7 +68,6 @@ pipeline {
                       --registry-login-server %ACR_LOGIN_SERVER% ^
                       --registry-username %USERNAME% ^
                       --registry-password %PASSWORD% ^
-                      --dns-name-label %ACI_NAME%-demo ^
                       --ports ${PORT} ^
                       --os-type ${OS_TYPE} ^
                       --location ${LOCATION} ^
