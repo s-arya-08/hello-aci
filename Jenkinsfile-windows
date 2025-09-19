@@ -54,33 +54,55 @@ pipeline {
                 """
             }
         }
-
-        stage('Deploy to ACI') {
+        stage('Deploy to Azure Container Apps') {
             steps {
                 bat """
                     echo Fetching ACR credentials...
-                    for /f "delims=" %%u in ('az acr credential show --name %ACR_NAME% --query "username" -o tsv') do set USERNAME=%%u
-                    for /f "delims=" %%p in ('az acr credential show --name %ACR_NAME% --query "passwords[0].value" -o tsv') do set PASSWORD=%%p
+                    for /f "delims=" %%i in ('az acr credential show --name %ACR_NAME% --query "username" -o tsv') do set USERNAME=%%i
+                    for /f "delims=" %%i in ('az acr credential show --name %ACR_NAME% --query "passwords[0].value" -o tsv') do set PASSWORD=%%i
 
-                    echo Deploying container to Azure...
-                    az container create ^
-                      --resource-group %RESOURCE_GROUP% ^
-                      --name %ACI_NAME% ^
-                      --image %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG% ^
-                      --registry-login-server %ACR_LOGIN_SERVER% ^
-                      --registry-username %USERNAME% ^
-                      --registry-password %PASSWORD% ^
-                      --subnet ${subnetName} ^
-                      --vnet ${VNetName} ^
-                      --ports ${PORT} ^
-                      --os-type ${OS_TYPE} ^
-                      --location ${LOCATION} ^
-                      --cpu ${CPU} ^
-                      --memory ${MEMORY} ^
-                      --restart-policy Always
+                    echo Creating/Updating Azure Container App...
+                    az containerapp create ^
+                        --name my-container-app ^
+                        --resource-group %RESOURCE_GROUP% ^
+                        --environment %CONTAINERAPPS_ENV% ^
+                        --image %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG% ^
+                        --target-port 5000 ^
+                        --ingress external ^
+                        --registry-server %ACR_LOGIN_SERVER% ^
+                        --registry-username %USERNAME% ^
+                        --registry-password %PASSWORD% ^
+                        --query properties.configuration.ingress.fqdn
                 """
             }
         }
+
+        // stage('Deploy to ACI') {
+        //     steps {
+        //         bat """
+        //             echo Fetching ACR credentials...
+        //             for /f "delims=" %%u in ('az acr credential show --name %ACR_NAME% --query "username" -o tsv') do set USERNAME=%%u
+        //             for /f "delims=" %%p in ('az acr credential show --name %ACR_NAME% --query "passwords[0].value" -o tsv') do set PASSWORD=%%p
+
+        //             echo Deploying container to Azure...
+        //             az container create ^
+        //               --resource-group %RESOURCE_GROUP% ^
+        //               --name %ACI_NAME% ^
+        //               --image %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG% ^
+        //               --registry-login-server %ACR_LOGIN_SERVER% ^
+        //               --registry-username %USERNAME% ^
+        //               --registry-password %PASSWORD% ^
+        //               --subnet ${subnetName} ^
+        //               --vnet ${VNetName} ^
+        //               --ports ${PORT} ^
+        //               --os-type ${OS_TYPE} ^
+        //               --location ${LOCATION} ^
+        //               --cpu ${CPU} ^
+        //               --memory ${MEMORY} ^
+        //               --restart-policy Always
+        //         """
+        //     }
+        // }
     }
 
     post {
