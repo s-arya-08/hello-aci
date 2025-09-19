@@ -68,7 +68,7 @@ pipeline {
                         --resource-group %RESOURCE_GROUP% ^
                         --environment ${CONTAINERAPPS_ENV} ^
                         --image %ACR_LOGIN_SERVER%/%IMAGE_NAME%:%IMAGE_TAG% ^
-                        --target-port 5000 ^
+                        --target-port ${PORT} ^
                         --ingress external ^
                         --registry-server %ACR_LOGIN_SERVER% ^
                         --registry-username %USERNAME% ^
