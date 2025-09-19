@@ -53,31 +53,54 @@ pipeline {
             }
         }
 
-        stage('Deploy to ACI') {
+        stage('Deploy to Azure Container Apps') {
             steps {
                 sh """
                     echo "Fetching ACR credentials..."
-                    USERNAME=\$(az acr credential show --name \$ACR_NAME --query "username" -o tsv)
-                    PASSWORD=\$(az acr credential show --name \$ACR_NAME --query "passwords[0].value" -o tsv)
+                    USERNAME=\$(az acr credential show --name $ACR_NAME --query "username" -o tsv)
+                    PASSWORD=\$(az acr credential show --name $ACR_NAME --query "passwords[0].value" -o tsv)
 
-                    echo "Deploying container to Azure..."
-                    az container create \
-                        --resource-group \$RESOURCE_GROUP \
-                        --name \$ACI_NAME \
-                        --image \$ACR_LOGIN_SERVER/\$IMAGE_NAME:\$IMAGE_TAG \
-                        --registry-login-server \$ACR_LOGIN_SERVER \
+                    echo "Creating/Updating Azure Container App..."
+                    az containerapp create \
+                        --name my-container-app \
+                        --resource-group $RESOURCE_GROUP \
+                        --environment $CONTAINERAPPS_ENV \
+                        --image $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG \
+                        --target-port 5000 \
+                        --ingress external \
+                        --registry-server $ACR_LOGIN_SERVER \
                         --registry-username \$USERNAME \
                         --registry-password \$PASSWORD \
-                        --dns-name-label \${ACI_NAME}-demo \
-                        --ports \$PORT \
-                        --os-type \$OS \
-                        --location \$LOCATION \
-                        --cpu \$CPU \
-                        --memory \$MEMORY \
-                        --restart-policy Always
+                        --query properties.configuration.ingress.fqdn
                 """
             }
         }
+
+        // stage('Deploy to ACI') {
+        //     steps {
+        //         sh """
+        //             echo "Fetching ACR credentials..."
+        //             USERNAME=\$(az acr credential show --name \$ACR_NAME --query "username" -o tsv)
+        //             PASSWORD=\$(az acr credential show --name \$ACR_NAME --query "passwords[0].value" -o tsv)
+
+        //             echo "Deploying container to Azure..."
+        //             az container create \
+        //                 --resource-group \$RESOURCE_GROUP \
+        //                 --name \$ACI_NAME \
+        //                 --image \$ACR_LOGIN_SERVER/\$IMAGE_NAME:\$IMAGE_TAG \
+        //                 --registry-login-server \$ACR_LOGIN_SERVER \
+        //                 --registry-username \$USERNAME \
+        //                 --registry-password \$PASSWORD \
+        //                 --dns-name-label \${ACI_NAME}-demo \
+        //                 --ports \$PORT \
+        //                 --os-type \$OS \
+        //                 --location \$LOCATION \
+        //                 --cpu \$CPU \
+        //                 --memory \$MEMORY \
+        //                 --restart-policy Always
+        //         """
+        //     }
+        // }
     }
 
     post {
